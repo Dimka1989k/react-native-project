@@ -17,11 +17,11 @@ const initialState = {
   password: "",
 };
 
-export default function RegistrationScreen() {
+export default function LoginScreen({ navigation }) {
+  console.log("navigation", navigation);
   const [isShowKeyBoard, setIsShowKeyBoard] = useState(false);
   const [showPassword, setShowPassword] = useState(true);
   const [state, setState] = useState(initialState);
-  const [loginBorderOnFocus, setLoginBorderOnFocus] = useState("#E8E8E8");
   const [emailBorderOnFocus, setEmailBorderOnFocus] = useState("#E8E8E8");
   const [passwordBorderOnFocus, setPasswordBorderOnFocus] = useState("#E8E8E8");
 
@@ -111,7 +111,12 @@ export default function RegistrationScreen() {
                 <TouchableOpacity>
                   <Text style={styles.bottomTitle}>
                     Don't have an account?
-                    <Text style={styles.btnSingin}>&nbsp;Sign up</Text>
+                    <Text
+                      onPress={() => navigation.navigate("Register")}
+                      style={styles.btnSingin}
+                    >
+                      &nbsp;Sign up
+                    </Text>
                   </Text>
                 </TouchableOpacity>
               </View>

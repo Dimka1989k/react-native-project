@@ -1,14 +1,16 @@
-import RegistrationScreen from "./Screens/RegistrationScreen";
-import LoginScreen from "./Screens/LoginScreen";
 import * as SplashScreen from "expo-splash-screen";
 import { useFonts } from "expo-font";
 import { StyleSheet } from "react-native";
 import { useCallback } from "react";
 
+import { NavigationContainer } from "@react-navigation/native";
+import { useRoute } from "./router";
+
 import { View } from "react-native";
 SplashScreen.preventAutoHideAsync();
 
 export default function App() {
+  const ruoting = useRoute(true);
   const [fontsLoaded] = useFonts({
     medium: require("./assets/fonts/robmedium.ttf"),
     normal: require("./assets/fonts/robregular.ttf"),
@@ -26,7 +28,7 @@ export default function App() {
   }
   return (
     <View style={styles.container} onLayout={onLayoutRootView}>
-      {true ? <RegistrationScreen /> : <LoginScreen />}
+      <NavigationContainer>{ruoting}</NavigationContainer>
     </View>
   );
 }
