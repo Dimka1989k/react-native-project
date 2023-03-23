@@ -10,7 +10,7 @@ import { View } from "react-native";
 SplashScreen.preventAutoHideAsync();
 
 export default function App() {
-  const ruoting = useRoute(true);
+  const routing = useRoute(true);
   const [fontsLoaded] = useFonts({
     medium: require("./assets/fonts/robmedium.ttf"),
     normal: require("./assets/fonts/robregular.ttf"),
@@ -28,7 +28,7 @@ export default function App() {
   }
   return (
     <View style={styles.container} onLayout={onLayoutRootView}>
-      <NavigationContainer>{ruoting}</NavigationContainer>
+      <NavigationContainer>{routing}</NavigationContainer>
     </View>
   );
 }

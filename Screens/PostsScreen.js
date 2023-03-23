@@ -10,7 +10,12 @@ const PostedScreens = createNativeStackNavigator();
 
 export default function PostScreens({ navigation }) {
   return (
-    <PostedScreens.Navigator>
+    <PostedScreens.Navigator initialRouteName="Home">
+      <PostedScreens.Screen
+        options={{ headerShown: false }}
+        name="Home"
+        component={Home}
+      />
       <PostedScreens.Screen
         options={{ headerShown: false }}
         name="Comments"

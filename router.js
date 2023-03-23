@@ -56,6 +56,7 @@ export const useRoute = (isAuth) => {
       }}
     >
       <MainTab.Screen
+        style={{ marginLeft: 106 }}
         name="Posts"
         component={PostsScreen}
         options={{
@@ -90,7 +91,7 @@ export const useRoute = (isAuth) => {
               }}
             >
               <AntDesign
-                style={{ marginLeft: 16 }}
+                style={{ marginRight: 106 }}
                 name="arrowleft"
                 size={24}
                 color="#BDBDBD"
@@ -100,7 +101,7 @@ export const useRoute = (isAuth) => {
 
           headerBackButtonMenuEnabled: true,
         }}
-        name="CreatePosts"
+        name="Create Posts"
         component={CreatePostsScreen}
       />
 
