@@ -1,4 +1,5 @@
 import React from "react";
+import { useDispatch } from "react-redux";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { View, StyleSheet, TouchableOpacity } from "react-native";
@@ -7,8 +8,7 @@ import LoginScreen from "./Screens/LoginScreen";
 import PostsScreen from "./Screens/PostsScreen";
 import CreatePostsScreen from "./Screens/CreatePostsScreen";
 import ProfileScreen from "./Screens/ProfileScreen";
-
-// import Home from "./Screens/Home";
+import { authSignOutUser } from "./redux/auth/authOperations";
 
 import { SimpleLineIcons } from "@expo/vector-icons";
 import { Feather } from "@expo/vector-icons";
@@ -19,6 +19,10 @@ const AuthStack = createNativeStackNavigator();
 const MainTab = createBottomTabNavigator();
 
 export const useRoute = (isAuth) => {
+  const dispatch = useDispatch();
+  const signOut = () => {
+    dispatch(authSignOutUser());
+  };
   if (!isAuth) {
     return (
       <AuthStack.Navigator>
@@ -69,6 +73,7 @@ export const useRoute = (isAuth) => {
               name="ios-exit-outline"
               size={26}
               color="#BDBDBD"
+              onPress={signOut}
             />
           ),
         }}

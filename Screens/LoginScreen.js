@@ -11,6 +11,12 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
 } from "react-native";
+import { useSelector, useDispatch } from "react-redux";
+// import { changeAuth } from "../../redux/store";
+import * as SplashScreen from "expo-splash-screen";
+
+import { authSignInUser } from "../redux/auth/authOperations";
+SplashScreen.preventAutoHideAsync();
 
 const initialState = {
   email: "",
@@ -25,6 +31,8 @@ export default function LoginScreen({ navigation }) {
   const [emailBorderOnFocus, setEmailBorderOnFocus] = useState("#E8E8E8");
   const [passwordBorderOnFocus, setPasswordBorderOnFocus] = useState("#E8E8E8");
 
+  const dispatch = useDispatch();
+
   const changePasswordVisible = () => {
     setShowPassword(!showPassword);
   };
@@ -32,8 +40,16 @@ export default function LoginScreen({ navigation }) {
   const keyboardHide = () => {
     setIsShowKeyBoard(false);
     Keyboard.dismiss();
-    console.log(state);
+
     setState(initialState);
+  };
+
+  const submitData = () => {
+    setIsShowKeyBoard(false);
+    Keyboard.dismiss();
+    setState(initialState);
+
+    dispatch(authSignInUser(state));
   };
 
   return (
@@ -105,8 +121,8 @@ export default function LoginScreen({ navigation }) {
                     {showPassword ? "Show" : "Hide"}
                   </Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.btn} onPress={keyboardHide}>
-                  <Text style={styles.btnTitle}>Register</Text>
+                <TouchableOpacity style={styles.btn} onPress={submitData}>
+                  <Text style={styles.btnTitle}>Sign in</Text>
                 </TouchableOpacity>
                 <TouchableOpacity>
                   <Text style={styles.bottomTitle}>

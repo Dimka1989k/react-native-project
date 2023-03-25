@@ -8,6 +8,9 @@ import {
   TouchableOpacity,
 } from "react-native";
 import uuid from "react-uuid";
+import { useSelector } from "react-redux";
+import { onSnapshot, collection } from "firebase/firestore";
+import { db } from "../firebase/config";
 
 import { FontAwesome } from "@expo/vector-icons";
 import { Feather } from "@expo/vector-icons";
@@ -16,13 +19,30 @@ import { EvilIcons } from "@expo/vector-icons";
 const Home = ({ navigation }) => {
   const [posts, setPosts] = useState([]);
 
+  const { email, login } = useSelector((state) => state.auth);
+
+  const getAllPost = async () => {
+    await onSnapshot(collection(db, "posts"), (data) => {
+      setPosts(
+        data.docs.map((doc) => ({
+          ...doc.data(),
+          id: doc.id,
+        }))
+      );
+    });
+  };
+
+  useEffect(() => {
+    getAllPost();
+  }, []);
+
   return (
     <View style={styles.container}>
       <View style={styles.userBox}>
         <Image source={require("../images/ava.png")} style={styles.Ava} />
         <View style={styles.userData}>
-          <Text style={styles.userName}>login</Text>
-          <Text style={styles.userEmail}>email</Text>
+          <Text style={styles.userName}>{login}</Text>
+          <Text style={styles.userEmail}>{email}</Text>
         </View>
       </View>
 
@@ -37,7 +57,7 @@ const Home = ({ navigation }) => {
               <TouchableOpacity
                 activeOpacity={0.8}
                 onPress={() =>
-                  navigation.navigate("CommentsScreen", {
+                  navigation.navigate("Comments", {
                     photo: item.photo,
                     postId: item.id,
                     userId: item.userId,
@@ -64,14 +84,12 @@ const Home = ({ navigation }) => {
                 activeOpacity={0.8}
                 style={{ flexDirection: "row", marginLeft: "auto" }}
                 onPress={() =>
-                  navigation.navigate("Map", { location: item.location })
+                  navigation.navigate("MapScreen", { location: item.location })
                 }
               >
                 <View style={styles.postLocation}>
                   <EvilIcons name="location" size={24} color="#BDBDBD" />
-                  <Text style={styles.postLocationItem}>
-                    {item.locationName}
-                  </Text>
+                  <Text style={styles.postLocationItem}>{item.location}</Text>
                 </View>
               </TouchableOpacity>
             </View>

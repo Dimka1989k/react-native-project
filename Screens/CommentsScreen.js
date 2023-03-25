@@ -11,15 +11,60 @@ import {
   Keyboard,
   FlatList,
 } from "react-native";
+import { db } from "../firebase/config";
+import { useSelector } from "react-redux";
+import {
+  addDoc,
+  collection,
+  doc,
+  onSnapshot,
+  updateDoc,
+} from "firebase/firestore";
 
 export default function CommentsScreen({ route }) {
   const [isShowKeyboard, setIsShowKeyboard] = useState(false);
   const [comment, setComment] = useState("");
-  // const [allComment, setAllComment] = useState([]);
+  const [allComment, setAllComment] = useState([]);
+
+  const { login } = useSelector((state) => state.auth);
+
+  const { photo, postId, userId } = route.params;
 
   const keyboardHide = () => {
     Keyboard.dismiss();
   };
+
+  const addComment = async () => {
+    await addDoc(collection(doc(db, "posts", postId), "comments"), {
+      comment,
+      login,
+      date: new Date().toString(),
+      userId,
+    });
+
+    setComment("");
+    Keyboard.dismiss();
+  };
+
+  const getAllPosts = async () => {
+    await onSnapshot(
+      collection(doc(db, "posts", postId), "comments"),
+      (data) => {
+        setAllComment(
+          data.docs.map((doc) => ({
+            ...doc.data(),
+            id: doc.id,
+            dateComment: doc.data().date,
+            time: doc.data().date,
+          }))
+        );
+      }
+    );
+  };
+
+  useEffect(() => {
+    getAllPosts();
+  }, []);
 
   return (
     <>
@@ -27,11 +72,8 @@ export default function CommentsScreen({ route }) {
         <View style={styles.postBox}>
           <Image source={{ uri: photo }} style={styles.postBox} />
         </View>
-        <Text style={styles.textComments}>
-          {/* {allComment.length !== 0 ? "Comments:" : "There are no comments yet"} */}
-        </Text>
+        <Text style={styles.textComments}></Text>
         <FlatList
-          // data={allComment.sort((a, b) => (a.date > b.date ? 1 : -1))}
           renderItem={({ item }) => {
             return (
               <View style={styles.comment__box}>
@@ -64,7 +106,11 @@ export default function CommentsScreen({ route }) {
             style={styles.input}
             onSubmitEditing={keyboardHide}
           />
-          <TouchableOpacity style={styles.btn} activeOpacity={0.8}>
+          <TouchableOpacity
+            style={styles.btn}
+            activeOpacity={0.8}
+            onPress={addComment}
+          >
             <AntDesign name="arrowup" size={14} color="#ffffff" />
           </TouchableOpacity>
         </View>

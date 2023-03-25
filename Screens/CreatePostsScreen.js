@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   ImageBackground,
 } from "react-native";
+import { useSelector } from "react-redux";
 
 import { MaterialIcons } from "@expo/vector-icons";
 import { EvilIcons } from "@expo/vector-icons";
@@ -14,12 +15,19 @@ import { Camera } from "expo-camera";
 import * as MediaLibrary from "expo-media-library";
 import * as Location from "expo-location";
 
+import { db } from "../firebase/config";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import uuid from "react-uuid";
+import { storage } from "../firebase/config";
+import { collection, addDoc } from "firebase/firestore";
+
 const initialState = {
   Name: "",
   Location: "",
 };
 
 export default function CreatePostsScreen({ navigation }) {
+  const { userId, login } = useSelector((state) => state.auth);
   const [hasPermission, setHasPermission] = useState(null);
   const [cameraRef, setCameraRef] = useState(null);
   const [type, setType] = useState(Camera.Constants.Type.back);
@@ -59,12 +67,56 @@ export default function CreatePostsScreen({ navigation }) {
   }
 
   const takePhoto = async () => {
-    const photo = await cameraRef.takePictureAsync();
-    setPhoto(photo.uri);
+    if (cameraRef && location) {
+      const { uri } = await cameraRef.takePictureAsync();
+
+      setPhoto(uri);
+      const asset = await MediaLibrary.createAssetAsync(uri);
+    }
+  };
+
+  async function uploadPhotoToServer() {
+    try {
+      const response = await fetch(photo);
+
+      const file = await response.blob();
+
+      const uniquePhotoId = uuid();
+      const storageRef = ref(storage, `photos/photo_${uniquePhotoId}`);
+
+      await uploadBytes(storageRef, file);
+
+      const photoUrl = await getDownloadURL(storageRef);
+
+      return photoUrl;
+    } catch (error) {
+      console.log(error.message);
+    }
+  }
+
+  const uploadPostToServer = async () => {
+    try {
+      const photo = await uploadPhotoToServer();
+
+      const createPost = await addDoc(collection(db, "posts"), {
+        photo,
+        location,
+        name: state.Name,
+        locationName: state.Location,
+        location,
+        userId,
+        login,
+      });
+
+      console.log("Document written with ID: ", createPost);
+    } catch (error) {
+      console.log("error", error.message);
+    }
   };
 
   const sendPhoto = async () => {
-    navigation.navigate("Home", { photo, location });
+    navigation.navigate("Home", { photo, location, state });
+    await uploadPostToServer();
   };
 
   return (
@@ -72,15 +124,8 @@ export default function CreatePostsScreen({ navigation }) {
       {photo === "" ? (
         <>
           <Camera
-            imageStyle={{ borderRadius: 8, backgroundColor: "gray" }}
             style={styles.addImage}
-            onPress={() => {
-              setType(
-                type === Camera.Constants.Type.back
-                  ? Camera.Constants.Type.front
-                  : Camera.Constants.Type.back
-              );
-            }}
+            type={Camera.Constants.Type.back}
             ref={(ref) => {
               setCameraRef(ref);
             }}

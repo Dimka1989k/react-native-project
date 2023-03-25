@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Text,
   View,
@@ -9,6 +9,11 @@ import {
   Image,
   FlatList,
 } from "react-native";
+import { useSelector, useDispatch } from "react-redux";
+
+import { authSignOutUser } from "../redux/auth/authOperations";
+import { collection, onSnapshot, query, where } from "firebase/firestore";
+import { db } from "../firebase/config";
 
 import { AntDesign } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
@@ -18,6 +23,25 @@ import { EvilIcons } from "@expo/vector-icons";
 
 export default function ProfileScreen() {
   const [userPosts, setUserPosts] = useState([]);
+  const dispatch = useDispatch();
+  const { userId, login } = useSelector((state) => state.auth);
+
+  useEffect(() => {
+    getUserPosts();
+  }, []);
+
+  const getUserPosts = async () => {
+    onSnapshot(
+      query(collection(db, "posts"), where("userId", "==", userId)),
+      (data) => {
+        setUserPosts(data.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
+      }
+    );
+  };
+
+  const signOut = () => {
+    dispatch(authSignOutUser());
+  };
 
   return (
     <View style={styles.container}>
@@ -41,10 +65,16 @@ export default function ProfileScreen() {
               </TouchableOpacity>
             </View>
             <TouchableOpacity activeOpacity={0.8} style={styles.iconExit}>
-              <Ionicons name="exit-outline" size={26} color="#BDBDBD" />
+              <Ionicons
+                name="exit-outline"
+                size={26}
+                color="#BDBDBD"
+                onPress={signOut}
+              />
             </TouchableOpacity>
-            <Text style={styles.title}>UserName</Text>
+            <Text style={styles.title}>{login}</Text>
             <FlatList
+              data={userPosts.sort((a, b) => (a.date < b.date ? 1 : -1))}
               renderItem={({ item }) => (
                 <>
                   <View style={styles.postBox}>

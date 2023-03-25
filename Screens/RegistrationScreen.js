@@ -13,6 +13,8 @@ import {
 } from "react-native";
 
 import { AntDesign } from "@expo/vector-icons";
+import { useDispatch } from "react-redux";
+import { authSignUpUser } from "../redux/auth/authOperations";
 
 const initialState = {
   login: "",
@@ -28,6 +30,7 @@ export default function RegistrationScreen({ navigation }) {
   const [emailBorderOnFocus, setEmailBorderOnFocus] = useState("#E8E8E8");
   const [passwordBorderOnFocus, setPasswordBorderOnFocus] = useState("#E8E8E8");
 
+  const dispatch = useDispatch();
   const changePasswordVisible = () => {
     setShowPassword(!showPassword);
   };
@@ -35,8 +38,13 @@ export default function RegistrationScreen({ navigation }) {
   const keyboardHide = () => {
     setIsShowKeyBoard(false);
     Keyboard.dismiss();
-    console.log(state);
+  };
+
+  const submitData = () => {
+    setIsShowKeyBoard(false);
+    Keyboard.dismiss();
     setState(initialState);
+    dispatch(authSignUpUser(state));
   };
 
   return (
@@ -135,7 +143,7 @@ export default function RegistrationScreen({ navigation }) {
                     {showPassword ? "Show" : "Hide"}
                   </Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.btn} onPress={keyboardHide}>
+                <TouchableOpacity style={styles.btn} onPress={submitData}>
                   <Text style={styles.btnTitle}>Register</Text>
                 </TouchableOpacity>
                 <TouchableOpacity>
