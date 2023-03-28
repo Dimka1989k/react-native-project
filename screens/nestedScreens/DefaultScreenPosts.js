@@ -6,21 +6,25 @@ import {
   Image,
   FlatList,
   TouchableOpacity,
+  Button,
 } from "react-native";
 import uuid from "react-uuid";
 import { useSelector } from "react-redux";
 import { onSnapshot, collection } from "firebase/firestore";
-import { db } from "../firebase/config";
 
+import { db } from "../../firebase/config";
+
+//icons
 import { FontAwesome } from "@expo/vector-icons";
 import { Feather } from "@expo/vector-icons";
 import { EvilIcons } from "@expo/vector-icons";
 
-const Home = ({ navigation }) => {
+const DefaultScreenPosts = ({ navigation }) => {
   const [posts, setPosts] = useState([]);
+  const [allComment, setAllComment] = useState([]);
 
   const { email, login } = useSelector((state) => state.auth);
-
+  console.log("email?", email);
   const getAllPost = async () => {
     await onSnapshot(collection(db, "posts"), (data) => {
       setPosts(
@@ -35,11 +39,12 @@ const Home = ({ navigation }) => {
   useEffect(() => {
     getAllPost();
   }, []);
+  console.log("posts", posts.comments);
 
   return (
     <View style={styles.container}>
       <View style={styles.userBox}>
-        <Image source={require("../images/ava.png")} style={styles.Ava} />
+        <Image source={require("../../images/ava.png")} style={styles.Ava} />
         <View style={styles.userData}>
           <Text style={styles.userName}>{login}</Text>
           <Text style={styles.userEmail}>{email}</Text>
@@ -51,9 +56,9 @@ const Home = ({ navigation }) => {
         keyExtractor={(item, index) => (index.toString = uuid())}
         renderItem={({ item }) => (
           <View style={styles.postBox}>
-            <Image source={{ uri: item.photo }} style={styles.postPhotoBox} />
-            <Text style={styles.postTextBox}>{item.name}</Text>
-            <View style={styles.postDataBox}>
+            <Image source={{ uri: item.photo }} style={styles.postBox__photo} />
+            <Text style={styles.postBox__text}>{item.name}</Text>
+            <View style={styles.postBox__data}>
               <TouchableOpacity
                 activeOpacity={0.8}
                 onPress={() =>
@@ -71,7 +76,7 @@ const Home = ({ navigation }) => {
                   color="#FF6C00"
                   style={{ marginRight: 9 }}
                 />
-                <Text style={styles.postComments}>Soon..</Text>
+                <Text style={styles.postBox__comments}>Soon..</Text>
               </TouchableOpacity>
               <Feather
                 name="thumbs-up"
@@ -79,17 +84,19 @@ const Home = ({ navigation }) => {
                 color="#FF6C00"
                 style={{ marginRight: 10 }}
               />
-              <Text style={styles.postLikes}>Soon..</Text>
+              <Text style={styles.postBox__likes}>soon..</Text>
               <TouchableOpacity
                 activeOpacity={0.8}
                 style={{ flexDirection: "row", marginLeft: "auto" }}
                 onPress={() =>
-                  navigation.navigate("MapScreen", { location: item.location })
+                  navigation.navigate("Map", { location: item.location })
                 }
               >
-                <View style={styles.postLocation}>
+                <View style={styles.postBox__locationBox}>
                   <EvilIcons name="location" size={24} color="#BDBDBD" />
-                  <Text style={styles.postLocationItem}>{item.location}</Text>
+                  <Text style={styles.postBox__location}>
+                    {item.locationName}
+                  </Text>
                 </View>
               </TouchableOpacity>
             </View>
@@ -103,6 +110,8 @@ const Home = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    // justifyContent: 'center',
+    // alignItems: 'center',
   },
   userBox: {
     marginTop: 32,
@@ -120,14 +129,14 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   userName: {
-    fontFamily: "bold",
+    fontFamily: "Roboto_Bold",
 
     fontSize: 13,
     lineHeight: 15,
     color: "#212121",
   },
   userEmail: {
-    fontFamily: "normal",
+    fontFamily: "Roboto_Regular",
 
     fontSize: 11,
     lineHeight: 13,
@@ -137,51 +146,52 @@ const styles = StyleSheet.create({
     marginBottom: 32,
     marginHorizontal: 16,
   },
-  postPhotoBox: {
+  postBox__photo: {
     height: 240,
     width: "100%",
     justifyContent: "center",
     alignItems: "center",
     borderRadius: 8,
   },
-  postDataBox: {
+  postBox__data: {
     flexDirection: "row",
     height: 24,
   },
-  postTextBox: {
+  postBox__text: {
     marginTop: 8,
     color: "#212121",
-    fontFamily: "medium",
+    fontFamily: "Roboto_Medium",
 
     fontSize: 16,
     lineHeight: 19,
     marginBottom: 8,
   },
-  postComments: {
+  postBox__comments: {
     marginRight: 24,
     color: "#212121",
-    fontFamily: "normal",
-    fontWeight: 400,
+    fontFamily: "Roboto_Regular",
+
     fontSize: 16,
     lineHeight: 19,
   },
-  postLikes: {
+  postBox__likes: {
     marginRight: 24,
     color: "#212121",
-    fontFamily: "normal",
-    fontWeight: 400,
+    fontFamily: "Roboto_Regular",
+
     fontSize: 16,
     lineHeight: 19,
   },
-  postLocation: {
+  postBox__locationBox: {
     marginLeft: "auto",
     flexDirection: "row",
   },
-  postLocationItem: {
+  postBox__location: {
     color: "#212121",
-    fontFamily: "normal",
+    fontFamily: "Roboto_Regular",
+
     fontSize: 16,
     lineHeight: 19,
   },
 });
-export default Home;
+export default DefaultScreenPosts;

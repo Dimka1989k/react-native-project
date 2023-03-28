@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Text,
   View,
   StyleSheet,
+  TouchableWithoutFeedback,
   ImageBackground,
   TouchableOpacity,
   KeyboardAvoidingView,
@@ -10,18 +11,19 @@ import {
   FlatList,
 } from "react-native";
 import { useSelector, useDispatch } from "react-redux";
-
-import { authSignOutUser } from "../redux/auth/authOperations";
+import { changeAuth } from "../../redux/store";
+import { authSignOutUser } from "../../redux/auth/authOperations";
 import { collection, onSnapshot, query, where } from "firebase/firestore";
-import { db } from "../firebase/config";
+import { db } from "../../firebase/config";
 
+//icons
 import { AntDesign } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
 import { FontAwesome } from "@expo/vector-icons";
 import { Feather } from "@expo/vector-icons";
 import { EvilIcons } from "@expo/vector-icons";
 
-export default function ProfileScreen() {
+const ProfileScreen = () => {
   const [userPosts, setUserPosts] = useState([]);
   const dispatch = useDispatch();
   const { userId, login } = useSelector((state) => state.auth);
@@ -47,14 +49,17 @@ export default function ProfileScreen() {
     <View style={styles.container}>
       <ImageBackground
         style={styles.image}
-        source={require("../images/PhotoBG.png")}
+        source={require("../../images/PhotoBG.png")}
       >
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : "height"}
         >
           <View style={styles.bottomForm}>
             <View style={styles.avatarBox}>
-              <Image source={require("../images/ava.png")} style={styles.ava} />
+              <Image
+                source={require("../../images/PhotoBG.png")}
+                style={styles.ava}
+              />
               <TouchableOpacity activeOpacity={0.8}>
                 <AntDesign
                   name="closecircleo"
@@ -82,25 +87,25 @@ export default function ProfileScreen() {
                       source={{ uri: item.photo }}
                       style={styles.pictures}
                     />
-                    <Text style={styles.postText}>{item.name}</Text>
-                    <View style={styles.postData}>
+                    <Text style={styles.postBox__text}>{item.name}</Text>
+                    <View style={styles.postBox__data}>
                       <FontAwesome
                         name="comment"
                         size={18}
                         color="#FF6C00"
                         style={{ marginRight: 9 }}
                       />
-                      <Text style={styles.postComments}>Soon..</Text>
+                      <Text style={styles.postBox__comments}>Soon..</Text>
                       <Feather
                         name="thumbs-up"
                         size={18}
                         color="#FF6C00"
                         style={{ marginRight: 10 }}
                       />
-                      <Text style={styles.postLikes}>soon..</Text>
-                      <View style={styles.postLocation}>
+                      <Text style={styles.postBox__likes}>soon..</Text>
+                      <View style={styles.postBox__locationBox}>
                         <EvilIcons name="location" size={24} color="#BDBDBD" />
-                        <Text style={styles.postLocationItem}>
+                        <Text style={styles.postBox__location}>
                           {item.locationName}
                         </Text>
                       </View>
@@ -116,7 +121,7 @@ export default function ProfileScreen() {
       </ImageBackground>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -127,6 +132,7 @@ const styles = StyleSheet.create({
   image: {
     flex: 1,
     resizeMode: "cover",
+    // justifyContent: 'flex-end',
   },
   avatarBox: {
     position: "relative",
@@ -137,12 +143,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#F6F6F6",
     borderRadius: 16,
   },
-  ava: {
-    position: "absolute",
-    width: 120,
-    height: 120,
-    borderRadius: 16,
-  },
+  ava: { position: "absolute", width: 120, height: 120, borderRadius: 16 },
   postBox: {
     marginHorizontal: 16,
     marginBottom: 32,
@@ -154,40 +155,42 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: 8,
   },
-  postText: {
+  postBox__text: {
     marginTop: 8,
     color: "#212121",
-    fontFamily: "medium",
+    fontFamily: "Roboto_Medium",
+
     fontSize: 16,
     lineHeight: 19,
     marginBottom: 8,
   },
-  postData: {
+  postBox__data: {
     flexDirection: "row",
     height: 24,
   },
-  postComments: {
+  postBox__comments: {
     marginRight: 24,
     color: "#212121",
-    fontFamily: "normal",
+    fontFamily: "Roboto_Regular",
 
     fontSize: 16,
     lineHeight: 19,
   },
-  postLikes: {
+  postBox__likes: {
     marginRight: 24,
     color: "#212121",
-    fontFamily: "normal",
+    fontFamily: "Roboto_Regular",
+
     fontSize: 16,
     lineHeight: 19,
   },
-  postLocation: {
+  postBox__locationBox: {
     marginLeft: "auto",
     flexDirection: "row",
   },
-  postLocationItem: {
+  postBox__location: {
     color: "#212121",
-    fontFamily: "normal",
+    fontFamily: "Roboto_Regular",
 
     fontSize: 16,
     lineHeight: 19,
@@ -202,10 +205,13 @@ const styles = StyleSheet.create({
   },
   iconExit: {
     position: "absolute",
+    // alignItems: 'flex-end',
+    // marginRight: 16,
     right: 16,
     top: 16,
   },
   bottomForm: {
+    // flex: 1,
     backgroundColor: "#FFFFFF",
     borderTopLeftRadius: 25,
     borderTopRightRadius: 25,
@@ -215,18 +221,21 @@ const styles = StyleSheet.create({
   },
   title: {
     color: "#212121",
-    fontFamily: "bold",
+    fontFamily: "Roboto_Bold",
     fontSize: 30,
     lineHeight: 35,
+
     marginBottom: 16,
     marginTop: 32,
+    // justifyContent: 'center',
     textAlign: "center",
   },
 
   btnNavigate: {
-    fontFamily: "normal",
+    fontFamily: "Roboto_Regular",
     fontSize: 16,
     lineHeight: 19,
     color: "#1B4371",
   },
 });
+export default ProfileScreen;

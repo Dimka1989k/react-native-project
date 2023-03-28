@@ -1,24 +1,24 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import {
   Text,
   View,
   StyleSheet,
+  Image,
   TextInput,
   TouchableOpacity,
   ImageBackground,
+  AppRegistry,
 } from "react-native";
 import { useSelector } from "react-redux";
-
 import { MaterialIcons } from "@expo/vector-icons";
 import { EvilIcons } from "@expo/vector-icons";
 import { Camera } from "expo-camera";
 import * as MediaLibrary from "expo-media-library";
 import * as Location from "expo-location";
-
-import { db } from "../firebase/config";
+import { db } from "../../firebase/config";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import uuid from "react-uuid";
-import { storage } from "../firebase/config";
+import { storage } from "../../firebase/config";
 import { collection, addDoc } from "firebase/firestore";
 
 const initialState = {
@@ -26,8 +26,9 @@ const initialState = {
   Location: "",
 };
 
-export default function CreatePostsScreen({ navigation }) {
+const CreateScreen = ({ navigation }) => {
   const { userId, login } = useSelector((state) => state.auth);
+
   const [hasPermission, setHasPermission] = useState(null);
   const [cameraRef, setCameraRef] = useState(null);
   const [type, setType] = useState(Camera.Constants.Type.back);
@@ -78,7 +79,7 @@ export default function CreatePostsScreen({ navigation }) {
   async function uploadPhotoToServer() {
     try {
       const response = await fetch(photo);
-
+      //blob - it's to some format
       const file = await response.blob();
 
       const uniquePhotoId = uuid();
@@ -87,7 +88,7 @@ export default function CreatePostsScreen({ navigation }) {
       await uploadBytes(storageRef, file);
 
       const photoUrl = await getDownloadURL(storageRef);
-
+      // console.log('photoUrl', photoUrl);
       return photoUrl;
     } catch (error) {
       console.log(error.message);
@@ -97,7 +98,17 @@ export default function CreatePostsScreen({ navigation }) {
   const uploadPostToServer = async () => {
     try {
       const photo = await uploadPhotoToServer();
-
+      console.log(
+        "photo?",
+        photo,
+        location,
+        state.Name,
+        state.Location,
+        location,
+        userId,
+        login
+      );
+      console.log("test1");
       const createPost = await addDoc(collection(db, "posts"), {
         photo,
         location,
@@ -107,7 +118,7 @@ export default function CreatePostsScreen({ navigation }) {
         userId,
         login,
       });
-
+      console.log("test2");
       console.log("Document written with ID: ", createPost);
     } catch (error) {
       console.log("error", error.message);
@@ -115,7 +126,8 @@ export default function CreatePostsScreen({ navigation }) {
   };
 
   const sendPhoto = async () => {
-    navigation.navigate("Home", { photo, location, state });
+    // console.log(navigation);
+    navigation.navigate("DefaultScreen", { photo, location, state });
     await uploadPostToServer();
   };
 
@@ -152,6 +164,7 @@ export default function CreatePostsScreen({ navigation }) {
           >
             <ImageBackground
               source={{ uri: photo }}
+              // resizeMode="cover"
               style={{
                 width: "100%",
                 height: "100%",
@@ -210,18 +223,19 @@ export default function CreatePostsScreen({ navigation }) {
       </TouchableOpacity>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+
+    // alignItems: 'center',
   },
   addImage: {
     justifyContent: "center",
     alignItems: "center",
     marginTop: 32,
-
+    // minWidth: 343,
     height: 240,
     marginHorizontal: 16,
     backgroundColor: "#E8E8E8",
@@ -237,7 +251,8 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
   },
   text: {
-    fontFamily: "normal",
+    fontFamily: "Roboto_Regular",
+
     fontSize: 16,
     lineHeight: 19,
     color: "#BDBDBD",
@@ -252,7 +267,8 @@ const styles = StyleSheet.create({
     borderBottomColor: "#E8E8E8",
     marginBottom: 16,
     color: "#212121",
-    fontFamily: "normal",
+    fontFamily: "Roboto_Regular",
+
     fontSize: 16,
     lineHeight: 19,
   },
@@ -263,12 +279,20 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     marginTop: 43,
     alignItems: "center",
-    backgroundColor: "#F6F6F6",
+    ...Platform.select({
+      ios: {
+        backgroundColor: "#FF6C00",
+      },
+      android: {
+        backgroundColor: "#FF6C00",
+      },
+    }),
   },
   btnText: {
-    fontFamily: "normal",
-    color: "#BDBDBD",
+    fontFamily: "Roboto_Regular",
+    color: "#FFFFFF",
     fontSize: 16,
     lineHeight: 19,
   },
 });
+export default CreateScreen;

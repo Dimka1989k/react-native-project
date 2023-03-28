@@ -1,9 +1,17 @@
-import React from "react";
-import { View, StyleSheet } from "react-native";
+import React, { useState, useEffect, useRef } from "react";
+import {
+  Text,
+  View,
+  StyleSheet,
+  Image,
+  TextInput,
+  TouchableOpacity,
+  ImageBackground,
+} from "react-native";
 
 import MapView, { Marker } from "react-native-maps";
 
-const MapScreen = ({ route }) => {
+const MapScreen = ({ navigation, route }) => {
   return (
     <View style={styles.container}>
       <MapView

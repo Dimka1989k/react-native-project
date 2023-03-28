@@ -1,17 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { AntDesign } from "@expo/vector-icons";
-
-import {
-  Text,
-  View,
-  StyleSheet,
-  Image,
-  TextInput,
-  TouchableOpacity,
-  Keyboard,
-  FlatList,
-} from "react-native";
-import { db } from "../firebase/config";
+import { db } from "../../firebase/config";
 import { useSelector } from "react-redux";
 import {
   addDoc,
@@ -21,7 +10,22 @@ import {
   updateDoc,
 } from "firebase/firestore";
 
-export default function CommentsScreen({ route }) {
+import {
+  Text,
+  View,
+  StyleSheet,
+  Image,
+  TextInput,
+  TouchableOpacity,
+  ImageBackground,
+  Keyboard,
+  TouchableWithoutFeedback,
+  KeyboardAvoidingView,
+  FlatList,
+  SafeAreaView,
+} from "react-native";
+
+const CommentsScreen = ({ route }) => {
   const [isShowKeyboard, setIsShowKeyboard] = useState(false);
   const [comment, setComment] = useState("");
   const [allComment, setAllComment] = useState([]);
@@ -41,7 +45,9 @@ export default function CommentsScreen({ route }) {
       date: new Date().toString(),
       userId,
     });
-
+    // await updateDoc(doc(db, 'posts', postId), {
+    //   totalComment: allComment.length + 1,
+    // });
     setComment("");
     Keyboard.dismiss();
   };
@@ -66,24 +72,34 @@ export default function CommentsScreen({ route }) {
     getAllPosts();
   }, []);
 
+  console.log("leng", allComment);
   return (
     <>
+      {/* <TouchableWithoutFeedback onPress={keyboardHide}> */}
+      {/* <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}> */}
       <View style={styles.container}>
         <View style={styles.postBox}>
-          <Image source={{ uri: photo }} style={styles.postBox} />
+          <Image source={{ uri: photo }} style={styles.postBox__photo} />
         </View>
-        <Text style={styles.textComments}></Text>
+        <Text style={styles.textComments}>
+          {allComment.length !== 0 ? "Comments:" : "There are no comments yet"}
+        </Text>
         <FlatList
+          data={allComment.sort((a, b) => (a.date > b.date ? 1 : -1))}
           renderItem={({ item }) => {
             return (
               <View style={styles.comment__box}>
                 <View style={styles.commentsWrapFirst}>
                   <View>
-                    <Text style={styles.comment}>Comments</Text>
-                    <View style={styles.commentDateCard}>
-                      <Text style={styles.commentDate}></Text>
-                      <View style={styles.commentBorder}></View>
-                      <Text style={styles.commentDate}></Text>
+                    <Text style={styles.comment__text}>{item.comment}</Text>
+                    <View style={styles.commentDateBox}>
+                      <Text style={styles.commentDateBox__date}>
+                        {/* {item.dateComment} */}
+                      </Text>
+                      <View style={styles.comment__border}></View>
+                      <Text style={styles.commentDateBox__date}>
+                        {/* {item.time} */}
+                      </Text>
                     </View>
                   </View>
                 </View>
@@ -96,46 +112,51 @@ export default function CommentsScreen({ route }) {
           keyExtractor={(item) => item.id}
         />
 
-        <View style={styles.inputComments}>
+        <View style={styles.input__box}>
           <TextInput
+            onChangeText={setComment}
             onFocus={() => {
               setIsShowKeyboard(true);
             }}
+            value={comment}
             placeholder="Comments..."
             placeholderTextColor={"#BDBDBD"}
             style={styles.input}
             onSubmitEditing={keyboardHide}
           />
           <TouchableOpacity
+            onPress={addComment}
             style={styles.btn}
             activeOpacity={0.8}
-            onPress={addComment}
           >
             <AntDesign name="arrowup" size={14} color="#ffffff" />
           </TouchableOpacity>
         </View>
       </View>
+      {/* </KeyboardAvoidingView> */}
+      {/* </TouchableWithoutFeedback> */}
     </>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     marginHorizontal: 16,
+    // alignItems: 'center',
   },
   postBox: {
     marginBottom: 32,
   },
   textComments: {
     color: "#212121",
-    fontFamily: "normal",
-    fontWeight: 400,
+    fontFamily: "Roboto_Regular",
+    
     fontSize: 16,
     lineHeight: 19,
     marginBottom: 20,
   },
-  postBox: {
+  postBox__photo: {
     height: 240,
     width: "100%",
     justifyContent: "center",
@@ -157,22 +178,22 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 6,
     width: 299,
   },
-  comment: {
+  comment__text: {
     color: "#212121",
-    fontFamily: "normal",
+    fontFamily: "Roboto_Regular",
     fontSize: 13,
     lineHeight: 18,
   },
-  commentDateCard: {
+  commentDateBox: {
     marginTop: 8,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "flex-end",
   },
-  commentDate: {
+  commentDateBox__date: {
     color: "#BDBDBD",
   },
-  commentBorder: {
+  comment__border: {
     borderRightColor: "#BDBDBD",
     borderRightWidth: 1,
     height: 11,
@@ -184,11 +205,13 @@ const styles = StyleSheet.create({
     height: 28,
     borderRadius: 14,
   },
-  inputComments: {
+  input__box: {
     flexDirection: "row",
+
     backgroundColor: "#F6F6F6",
     paddingLeft: 16,
     paddingRight: 8,
+
     paddingTop: 8,
     paddingBottom: 8,
     borderColor: "#E8E8E8",
@@ -198,7 +221,7 @@ const styles = StyleSheet.create({
     marginTop: 30,
   },
   input: {
-    fontFamily: "medium",
+    fontFamily: "Roboto_Medium",
     fontSize: 16,
     lineHeight: 19,
     color: "#212121",
@@ -209,7 +232,9 @@ const styles = StyleSheet.create({
     width: 34,
     height: 34,
     borderRadius: 17,
+
     justifyContent: "center",
     alignItems: "center",
   },
 });
+export default CommentsScreen;

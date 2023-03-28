@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { State } from "react-native-gesture-handler";
 
 const state = {
   userId: null,
@@ -26,3 +27,5 @@ export const authSlice = createSlice({
   initialState: state,
   reducers: actions,
 });
+
+// console.log('authSlice', authSlice);

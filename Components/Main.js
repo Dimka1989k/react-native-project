@@ -4,11 +4,10 @@ import { useSelector, useDispatch } from "react-redux";
 import * as SplashScreen from "expo-splash-screen";
 import { useFonts } from "expo-font";
 
-import { View } from "react-native";
+import { View, Text } from "react-native";
 import { useRoute } from "../router";
 import { authStateChangeUser } from "../redux/auth/authOperations";
 SplashScreen.preventAutoHideAsync();
-
 const Main = () => {
   const { stateChange } = useSelector((state) => state.auth);
   const routing = useRoute(stateChange);
@@ -17,15 +16,18 @@ const Main = () => {
 
   const dispatch = useDispatch();
 
+  // console.log('stateChange?', stateChange);
   useEffect(() => {
+    // console.log('yes?');
     dispatch(authStateChangeUser());
   }, []);
 
   const [fontsLoaded] = useFonts({
-    medium: require("../assets/fonts/robmedium.ttf"),
-    normal: require("../assets/fonts/robregular.ttf"),
-    bold: require("../assets/fonts/robbold.ttf"),
+    Roboto_Regular: require("../assets/fonts/Roboto-Regular.ttf"),
+    Roboto_Medium: require("../assets/fonts/Roboto-Medium.ttf"),
+    Roboto_Bold: require("../assets/fonts/Roboto-Bold.ttf"),
   });
+
   const onLayoutRootView = useCallback(async () => {
     if (fontsLoaded) {
       await SplashScreen.hideAsync();

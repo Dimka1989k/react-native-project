@@ -1,5 +1,6 @@
-import { auth } from "../../firebase/config";
+import { db, auth } from "../../firebase/config";
 import {
+  getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   updateProfile,
@@ -15,6 +16,7 @@ const authSignUpUser = ({ login, email, password }) => async (
   dispatch,
   getState
 ) => {
+  // console.log(email, password, login);
   try {
     await createUserWithEmailAndPassword(auth, email, password);
 
@@ -38,9 +40,10 @@ const authSignUpUser = ({ login, email, password }) => async (
 };
 
 const authSignInUser = ({ email, password }) => async (dispatch, getState) => {
+  // console.log('login', email, password);
   try {
     const user = await signInWithEmailAndPassword(auth, email, password);
-
+    // console.log('user login?', user);
     return user;
   } catch (error) {
     console.log("error:", error);
@@ -63,6 +66,7 @@ const authStateChangeUser = () => async (dispatch, getState) => {
         email: user.email,
       };
 
+      // console.log('true?');
       dispatch(updateUserProfile(userUpdateProfile));
       dispatch(authStateChange({ stateChange: true }));
     }

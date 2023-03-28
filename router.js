@@ -1,31 +1,54 @@
-import React from "react";
-import { useDispatch } from "react-redux";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import React, { useEffect, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { View, StyleSheet, TouchableOpacity } from "react-native";
-import RegistrationScreen from "./Screens/RegistrationScreen";
-import LoginScreen from "./Screens/LoginScreen";
-import PostsScreen from "./Screens/PostsScreen";
-import CreatePostsScreen from "./Screens/CreatePostsScreen";
-import ProfileScreen from "./Screens/ProfileScreen";
+import { authStateChangeUser } from "./redux/auth/authOperations";
 import { authSignOutUser } from "./redux/auth/authOperations";
 
+//icon imports:
 import { SimpleLineIcons } from "@expo/vector-icons";
 import { Feather } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
 import { Ionicons } from "@expo/vector-icons";
 
-const AuthStack = createNativeStackNavigator();
-const MainTab = createBottomTabNavigator();
+//screen imports:
+import RegistrationScreen from "./screens/auth/RegistrationScreen";
+import LoginScreen from "./screens/auth/LoginScreen";
+import PostScreens from "./screens/main/PostsScreen";
+import CreateScreen from "./screens/main/CreatePostsScreen";
+import ProfileScreen from "./screens/main/ProfileScreen";
 
+import db from "./firebase/config";
+
+// const auth = getAuth(db);
+
+const AuthStack = createStackNavigator();
+const MainTab = createBottomTabNavigator();
 export const useRoute = (isAuth) => {
+  // const [isAuth, setIsAuth] = useState(false);
+  // onAuthStateChanged(auth, user => {
+  //   console.log('whatisit?', user);
+  //   if (user) {
+  //     setIsAuth(true);
+  //     // setCurrentUser(user);
+  //     return;
+  //   } else {
+  //     setIsAuth(false);
+  //     // setCurrentUser('');
+  //     return;
+  //   }
+  // });
+  // const isAuth = false;
   const dispatch = useDispatch();
   const signOut = () => {
     dispatch(authSignOutUser());
   };
+
+  // console.log('isit?', isAuth);
   if (!isAuth) {
     return (
-      <AuthStack.Navigator>
+      <AuthStack.Navigator initialRouteName="Register">
         <AuthStack.Screen
           options={{ headerShown: false }}
           name="Login"
@@ -44,10 +67,11 @@ export const useRoute = (isAuth) => {
       screenOptions={{
         tabBarShowLabel: false,
         tabBarHideOnKeyboard: true,
-        tabBarActiveTintColor: "#FF6C00",
+        tabBarActiveTintColor: "tomato",
         tabBarInactiveTintColor: "gray",
         tabBarItemStyle: {
           justifyContent: "center",
+          // alignItems: 'center',
           height: 40,
           marginTop: 9,
         },
@@ -60,9 +84,6 @@ export const useRoute = (isAuth) => {
       }}
     >
       <MainTab.Screen
-        style={{ marginLeft: 106 }}
-        name="Posts"
-        component={PostsScreen}
         options={{
           tabBarIcon: ({ focuses, size, color }) => (
             <SimpleLineIcons name="grid" size={24} color={color} />
@@ -70,13 +91,15 @@ export const useRoute = (isAuth) => {
           headerRight: () => (
             <Ionicons
               style={{ marginRight: 10 }}
-              name="ios-exit-outline"
+              name="exit-outline"
               size={26}
               color="#BDBDBD"
               onPress={signOut}
             />
           ),
         }}
+        name="Posts"
+        component={PostScreens}
       />
       <MainTab.Screen
         options={{
@@ -96,20 +119,23 @@ export const useRoute = (isAuth) => {
               }}
             >
               <AntDesign
-                style={{ marginRight: 106 }}
+                style={{ marginLeft: 16 }}
                 name="arrowleft"
                 size={24}
                 color="#BDBDBD"
+                // onPress={() => navigation.navigate('PostsScreen')}
               />
             </TouchableOpacity>
           ),
+          // <TouchableOpacity activeOpacity={0.8}>
+          //   <AntDesign style={{ marginLeft: 16 }} name="arrowleft" size={10} color="#BDBDBD" />
+          // </TouchableOpacity>
 
           headerBackButtonMenuEnabled: true,
         }}
-        name="Create Posts"
-        component={CreatePostsScreen}
+        name="Create"
+        component={CreateScreen}
       />
-
       <MainTab.Screen
         options={{
           tabBarIcon: ({ focuses, size, color }) => (
@@ -131,12 +157,6 @@ export const useRoute = (isAuth) => {
     </MainTab.Navigator>
   );
 };
-
-{
-  /* <MainTab.Screen name="Comments" component={CommentsScreen} />
-      <MainTab.Screen name="Home" component={Home} />
-      <MainTab.Screen name="Map" component={MapScreen} /> */
-}
 
 const styles = StyleSheet.create({
   addBtn: {
